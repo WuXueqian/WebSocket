@@ -14,10 +14,13 @@
         "lint-staged:ts": "tslint --fix -c .tslintrc.json"
     },
     "lint-staged": {
-        "src/**/*.{ts,tsx}": ["lint-staged:ts"]
+        "src/**/*.{ts,tsx}": [
+            "lint-staged:ts"
+        ]
     },
     "pre-commit": "lint-staged",
     "devDependencies": {
+        "@types/node": "^8.5.7",
         "lint-staged": "^6.0.0",
         "pre-commit": "^1.2.2",
         "tslint": "^5.8.0",
