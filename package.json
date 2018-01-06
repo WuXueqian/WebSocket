@@ -1,0 +1,27 @@
+{
+    "name": "websocket",
+    "version": "1.0.0",
+    "description": "Implementation of WebSocket for Node",
+    "main": "index.js",
+    "repository": "git@github.com:thundernet8/WebSocket.git",
+    "author": "wuxueqian <wuxueqian2010@hotmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc",
+        "lint": "npm run lint:ts",
+        "lint:ts": "tslint -e node_modules typings -c .tslintrc.json src/**/*.tsx",
+        "lint-staged": "lint-staged",
+        "lint-staged:ts": "tslint --fix -c .tslintrc.json"
+    },
+    "lint-staged": {
+        "src/**/*.{ts,tsx}": ["lint-staged:ts"]
+    },
+    "pre-commit": "lint-staged",
+    "devDependencies": {
+        "lint-staged": "^6.0.0",
+        "pre-commit": "^1.2.2",
+        "tslint": "^5.8.0",
+        "tslint-eslint-rules": "^4.1.1",
+        "typescript": "^2.6.2"
+    }
+}
