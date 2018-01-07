@@ -5,12 +5,16 @@ import { IncomingMessage } from "http";
 import * as url from "url";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
+import WebSocket from "./WebSocket";
+import { BinaryType } from "./Receiver";
 
 interface IWebSocketServerOptions {
     host?: string;
     port?: number;
     path?: string;
     server?: Server;
+    binaryType?: BinaryType;
+    maxPayload?: number;
 }
 
 export default class WebSocketServer extends EventEmitter {
@@ -41,7 +45,11 @@ export default class WebSocketServer extends EventEmitter {
             this.server = server;
         }
 
-        this.server.on("upgrade", this.handleUpgrade.bind(this));
+        this.server.on("upgrade", (req: IncomingMessage, socket: Socket) => {
+            this.handleUpgrade(req, socket, (client: WebSocket) => {
+                this.emit("connection", client, req);
+            });
+        });
 
         this.options = options;
     }
@@ -68,7 +76,7 @@ export default class WebSocketServer extends EventEmitter {
         socket.destroy();
     }
 
-    private handleUpgrade(req: IncomingMessage, socket: Socket) {
+    private handleUpgrade(req: IncomingMessage, socket: Socket, callback: (client) => void) {
         socket.on("error", socketError);
 
         const version = +req.headers["sec-websocket-version"]!;
@@ -110,6 +118,12 @@ export default class WebSocketServer extends EventEmitter {
         });
         socket.write(resHeaders);
         socket.removeListener("error", socketError);
+
+        const ws = new WebSocket({
+            binaryType: this.options.binaryType!
+        });
+        ws.setSocket(socket, req.rawHeaders, this.options.maxPayload || 1 << 10);
+        callback(ws);
     }
 }
 

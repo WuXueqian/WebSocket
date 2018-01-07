@@ -5,7 +5,7 @@
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "noUnusedParameters": true,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
         "target": "es5",
         "lib": [
             "dom",
