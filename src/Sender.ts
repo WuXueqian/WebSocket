@@ -64,8 +64,8 @@ export default class Sender extends EventEmitter {
         rsv1: boolean
     ) {
         const merge = data.length < 1024 || (mask && readOnly);
-        var offset = mask ? 6 : 2;
-        var payloadLength = data.length;
+        let offset = mask ? 6 : 2;
+        let payloadLength = data.length;
 
         if (data.length >= 65536) {
             offset += 8;
@@ -78,7 +78,7 @@ export default class Sender extends EventEmitter {
         const target = Buffer.allocUnsafe(merge ? data.length + offset : offset);
 
         target[0] = fin ? opcode | 0x80 : opcode;
-        if (rsv1) target[0] |= 0x40;
+        if (rsv1) { target[0] |= 0x40; }
 
         if (payloadLength === 126) {
             target.writeUInt16BE(data.length, 2, true);
@@ -106,13 +106,13 @@ export default class Sender extends EventEmitter {
         target[offset - 1] = maskBuf[3];
 
         if (merge) {
-            for (var i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 target[offset + i] = target[i] ^ maskBuf[i & 3];
             }
             return [target];
         }
 
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             data[i] = data[i] ^ maskBuf[i & 3];
         }
         return [target, data];

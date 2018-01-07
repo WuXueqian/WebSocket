@@ -19,7 +19,7 @@ const EMPTY_BUFFER = Buffer.alloc(0);
 
 const unmaskBuffer = (buffer: Buffer, mask: Buffer) => {
     const length = buffer.length;
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
         buffer[i] ^= mask[i & 3];
     }
 };
@@ -66,7 +66,7 @@ export default class Receiver extends EventEmitter {
 
         this.bufferedBytes -= length;
 
-        if (length === this.buffers[0].length) return this.buffers.shift();
+        if (length === this.buffers[0].length) { return this.buffers.shift(); }
 
         if (length < this.buffers[0].length) {
             dst = this.buffers[0].slice(0, length);
@@ -168,25 +168,26 @@ export default class Receiver extends EventEmitter {
             return;
         }
 
-        if (!this.fin && !this.fragmented) this.fragmented = this.opcode;
+        if (!this.fin && !this.fragmented) { this.fragmented = this.opcode; }
 
         this.masked = (buf![1] & 0x80) === 0x80;
 
-        if (this.payloadLength === 126) this.frameState = FrameParseState.GET_PAYLOAD_LENGTH_16;
-        else if (this.payloadLength === 127)
+        if (this.payloadLength === 126) { this.frameState = FrameParseState.GET_PAYLOAD_LENGTH_16; }
+        else if (this.payloadLength === 127) {
             this.frameState = FrameParseState.GET_PAYLOAD_LENGTH_64;
-        else this.haveLength();
+             }
+        else { this.haveLength(); }
     }
 
     private getPayloadLength16() {
-        if (!this.hasBufferedBytes(2)) return;
+        if (!this.hasBufferedBytes(2)) { return; }
 
         this.payloadLength = this.readBuffer(2)!.readUInt16BE(0, true);
         this.haveLength();
     }
 
     private getPayloadLength64() {
-        if (!this.hasBufferedBytes(8)) return;
+        if (!this.hasBufferedBytes(8)) { return; }
 
         const buf = this.readBuffer(8)!;
         const num = buf.readUInt32BE(0, true);
@@ -202,7 +203,7 @@ export default class Receiver extends EventEmitter {
     }
 
     private getMask() {
-        if (!this.hasBufferedBytes(4)) return;
+        if (!this.hasBufferedBytes(4)) { return; }
 
         this.mask = this.readBuffer(4)!;
         this.frameState = FrameParseState.GET_DATA;
@@ -212,10 +213,10 @@ export default class Receiver extends EventEmitter {
         let data = EMPTY_BUFFER;
 
         if (this.payloadLength) {
-            if (!this.hasBufferedBytes(this.payloadLength)) return;
+            if (!this.hasBufferedBytes(this.payloadLength)) { return; }
 
             data = this.readBuffer(this.payloadLength)!;
-            if (this.masked) unmaskBuffer(data, this.mask);
+            if (this.masked) { unmaskBuffer(data, this.mask); }
         }
 
         if (this.opcode > 0x07) {
@@ -238,12 +239,12 @@ export default class Receiver extends EventEmitter {
             return;
         }
 
-        if (this.masked) this.frameState = FrameParseState.GET_MASK;
-        else this.frameState = FrameParseState.GET_DATA;
+        if (this.masked) { this.frameState = FrameParseState.GET_MASK; }
+        else { this.frameState = FrameParseState.GET_DATA; }
     }
 
     private maxPayloadExceeded(length) {
-        if (length === 0 || this.maxPayload < 1) return false;
+        if (length === 0 || this.maxPayload < 1) { return false; }
 
         const fullLength = this.totalPayloadLength + length;
 
@@ -294,7 +295,7 @@ export default class Receiver extends EventEmitter {
     }
 
     private pushFragment(fragment: Buffer) {
-        if (fragment.length === 0) return true;
+        if (fragment.length === 0) { return true; }
 
         const totalLength = this.messageLength + fragment.length;
 
@@ -320,7 +321,7 @@ export default class Receiver extends EventEmitter {
             this.fragments = [];
 
             if (this.opcode === 2) {
-                var data;
+                let data;
 
                 if (this.binaryType === BinaryType.NODEBUFFER) {
                     data = toBuffer(fragments, messageLength);
@@ -355,12 +356,12 @@ export default class Receiver extends EventEmitter {
  * @private
  */
 function toBuffer(fragments, messageLength) {
-    if (fragments.length === 1) return fragments[0];
+    if (fragments.length === 1) { return fragments[0]; }
     if (fragments.length > 1) {
         const target = Buffer.allocUnsafe(messageLength);
         let offset = 0;
 
-        for (var i = 0; i < fragments.length; i++) {
+        for (let i = 0; i < fragments.length; i++) {
             const buf = fragments[i];
             buf.copy(target, offset);
             offset += buf.length;

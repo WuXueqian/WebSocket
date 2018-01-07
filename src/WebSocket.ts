@@ -37,6 +37,11 @@ export default class WebSocket extends EventEmitter {
     public setSocket(socket: Socket, headers: string[], maxPayload: number) {
         socket.setTimeout(0);
         socket.setNoDelay(true); //ignore Nagle
+        // （1）如果包长度达到MSS，则允许发送；
+        // （2）如果该包含有FIN，则允许发送；
+        // （3）设置了TCP_NODELAY选项，则允许发送；
+        // （4）未设置TCP_CORK选项时，若所有发出去的小数据包（包长度小于MSS）均被确认，则允许发送；
+        // （5）上述条件都未满足，但发生了超时（一般为200ms），则立即发送。
         if (headers.length) {
             socket.unshift(headers.join("\r\n"));
         }
