@@ -172,11 +172,9 @@ export default class Receiver extends EventEmitter {
 
         this.masked = (buf![1] & 0x80) === 0x80;
 
-        if (this.payloadLength === 126) { this.frameState = FrameParseState.GET_PAYLOAD_LENGTH_16; }
-        else if (this.payloadLength === 127) {
+        if (this.payloadLength === 126) { this.frameState = FrameParseState.GET_PAYLOAD_LENGTH_16; } else if (this.payloadLength === 127) {
             this.frameState = FrameParseState.GET_PAYLOAD_LENGTH_64;
-             }
-        else { this.haveLength(); }
+             } else { this.haveLength(); }
     }
 
     private getPayloadLength16() {
@@ -239,8 +237,7 @@ export default class Receiver extends EventEmitter {
             return;
         }
 
-        if (this.masked) { this.frameState = FrameParseState.GET_MASK; }
-        else { this.frameState = FrameParseState.GET_DATA; }
+        if (this.masked) { this.frameState = FrameParseState.GET_MASK; } else { this.frameState = FrameParseState.GET_DATA; }
     }
 
     private maxPayloadExceeded(length) {
